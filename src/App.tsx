@@ -1,46 +1,78 @@
 import { ChangeEvent, MouseEvent, useEffect, useState } from 'react'
 import NotesInput from './components/Input';
-// import Cards from './components/card';
-import './App.css'
-
-
-// const fetchApi = (url : string) => {
-//   fetch(url, {
-//     method: 'GET'
-//   })
-//   .then((response : Response) => {response.json()})
-
-//   // .then((data) => {console.log(data)})
-// }
+import Cards from './components/Card';
+import './App.css';
+import axios from 'axios';
 
 function App() {
-  const [state, setState] = useState('');
+  const [state, setState] = useState<string>('');
+  const [textData, setData] = useState<[]>([]);
+  const [deleteID, setDeleteID] = useState<number>();
+  const [stateUpdate, setUpdate] = useState<boolean>(true)
 
-  const handlerChange = (event : ChangeEvent<HTMLInputElement>) : void => {
-    setState(event.target.value)
+  const fetchApi = (url : string) => {
+    axios.get(url)
+    .then((ressponse) => {
+      setData(ressponse.data);
+    })
   }
 
-  const btnSend = (event : MouseEvent) => {
-    fetch('http://localhost:7070/note', {
-      method: 'POST',
-      headers: {'Content-Type' : 'application/json'},
-      body: JSON.stringify({text: state})
-    })
-    .then(data => {
-      console.log(data)
+  const deliteApi = (id : number) => {
+    axios.delete(`http://localhost:7070/notes/${id}`)
+    .then(response => {
+      console.log(`Deleted post with ID ${id}`);
     })
     .catch(error => {
-     console.log(error)
-    })  
+      console.error(error);
+    });
   }
 
-  // fetchApi('http://localhost:7070/notes')
+  const handlerChange = (event : ChangeEvent<HTMLInputElement>) : void => {
+    setState(event.target.value);
+  }
 
+  const btnSend = () => {
+    axios.post('http://localhost:7070/notes', {
+      "content": state
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+  }
+
+  const btnDelete = (event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent> ) => {
+    setDeleteID(event);
+    deliteApi(event)
+  }
+
+  const btnUpdateUser = () => {
+    setUpdate(!stateUpdate)
+    setData(textData)
+  }
+  
+  useEffect(() => {
+    void fetchApi('http://localhost:7070/notes');
+  },[textData]);
+
+  useEffect(() => {
+    void fetchApi('http://localhost:7070/notes');
+  },[deleteID])
+
+    useEffect(() => {
+    void fetchApi('http://localhost:7070/notes');
+  },[stateUpdate])
+  
   return(
     <>
-      <NotesInput onChange={handlerChange} type='text' onClick={btnSend}/>
+        <div className="conteiner-notes">
+            <button className="update" onClick={btnUpdateUser}>update</button>
+          {textData.map((text) => {
+            return <Cards onClick={btnDelete} text={text.content} key={text.id} id={text.id}/>
+          })}
+          <NotesInput onChange={handlerChange} type='text' onClick={btnSend}/>
+        </div>
     </>
   )
 }
 
-export default App
+export default App;
