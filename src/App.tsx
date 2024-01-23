@@ -55,6 +55,14 @@ function App() {
   useEffect(() => {
     void fetchApi('http://localhost:7070/notes');
   },[]);
+
+  useEffect(() => {
+    void fetchApi('http://localhost:7070/notes');
+  },[stateAdd])
+
+  useEffect(() => {
+    void fetchApi('http://localhost:7070/notes');
+  },[deleteID])
   
     useEffect(() => {
     void fetchApi('http://localhost:7070/notes');
