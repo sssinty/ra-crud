@@ -8,7 +8,8 @@ function App() {
   const [state, setState] = useState<string>('');
   const [textData, setData] = useState<[]>([]);
   const [deleteID, setDeleteID] = useState<number>();
-  const [stateUpdate, setUpdate] = useState<boolean>(true)
+  const [stateAdd, setStateAdd] = useState<boolean>(true);
+  const [stateUpdate, setUpdate] = useState<boolean>(true);
 
   const fetchApi = (url : string) => {
     axios.get(url)
@@ -38,6 +39,7 @@ function App() {
     .catch((error) => {
       console.log(error)
     })
+    setStateAdd(!stateAdd)
   }
 
   const btnDelete = (event: MouseEvent<HTMLButtonElement, globalThis.MouseEvent> ) => {
@@ -52,7 +54,11 @@ function App() {
   
   useEffect(() => {
     void fetchApi('http://localhost:7070/notes');
-  },[textData]);
+  },[]);
+
+  useEffect(() => {
+    void fetchApi('http://localhost:7070/notes');
+  },[stateAdd])
 
   useEffect(() => {
     void fetchApi('http://localhost:7070/notes');
